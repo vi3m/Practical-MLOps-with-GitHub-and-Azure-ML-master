@@ -1,0 +1,484 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>Catallaxy Services | Practical MLOps with GitHub and Azure ML</title>
+
+		<link rel="stylesheet" href="../reveal.js/dist/reset.css">
+		<link rel="stylesheet" href="../reveal.js/dist/reveal.css">
+		<link rel="stylesheet" href="../reveal.js/dist/theme/black.css" id="theme">
+		<link rel="stylesheet" href="../WebsiteAssets/mods.css">
+
+		<!-- Theme used for syntax highlighted code -->
+		<link rel="stylesheet" href="../reveal.js/plugin/highlight/monokai.css" id="highlight-theme">
+	</head>
+	<body>
+		<div class="reveal">
+			<div class="slides">
+				<section data-background-image="presentation/assets/image/Bubbles.jpg" data-background-opacity="0.4">
+					<h2>Practical MLOps with GitHub and Azure ML</h2>
+					
+					<a href="https://www.catallaxyservices.com">Kevin Feasel</a> (<a href="https://twitter.com/feaselkl">@feaselkl</a>)<br />
+					<a href="https://csmore.info/on/mlops">https://csmore.info/on/mlops</a>
+				</section>
+				
+				<section data-background-image="presentation/assets/image/Bubbles.jpg" data-background-opacity="0.4">
+					<h3>Who Am I?  What Am I Doing Here?</h3>
+					<div class="container">
+						<div class="col">
+							<table class="whoami">
+								<tr>
+									<td><a href="https://csmore.info"><img src="../WebsiteAssets/Logo.png" height="100" /></a></td>
+									<td nowrap><a href="https://csmore.info">Catallaxy Services</a></td>
+								</tr>
+								<tr>
+									<td><a href="https://curatedsql.com"><img src="../WebsiteAssets/CuratedSQLLogo.png" height="100" /></a></td>
+									<td nowrap><a href="https://curatedsql.com">Curated SQL</a></td>
+								</tr>
+								<tr>
+									<td><a href="https://www.amazon.com/Finding-Ghosts-Your-Data-Techniques/dp/1484288696"><img src="../WebsiteAssets/Finding-Ghosts.jpg" height="120" /></a></td>
+									<td nowrap><a href="https://www.amazon.com/Finding-Ghosts-Your-Data-Techniques/dp/1484288696">Finding Ghosts in Your Data</a></td>
+								</tr>
+							</table>
+						</div>
+						<div class="col">
+							<a href="http://www.twitter.com/feaselkl"><img src="../WebsiteAssets/HeadShot.jpg" height="358" width="315" /></a>
+							<br />
+							<a href="http://www.twitter.com/feaselkl">@feaselkl</a>
+						</div>					
+					</div>
+				</section>
+				
+				<section data-background-image="presentation/assets/background/motivation.jpg" data-background-opacity="0.2">
+					<h3>Motivation</h3>
+					
+					<p>My goals in this talk:</p>
+					
+					<ul>
+						<li>Provide a brief history of [x]Ops</li>
+						<li>Review a code-first Azure Machine Learning model</li>
+						<li>Describe the MLOps maturity model</li>
+						<li>Automate Azure ML pipelines with GitHub Actions</li>
+					</ul>
+				</section>
+				
+				<section data-background-image="presentation/assets/image/Bubbles.jpg" data-background-opacity="0.4">
+					<h3>What We'll Do</h3>
+
+					<img src="presentation/assets/image/Demo01.png" height="550" />
+				</section>
+				
+				<section data-background-image="presentation/assets/image/Bubbles.jpg" data-background-opacity="0.4">
+					<h3>What We'll Do</h3>
+					
+					<img src="presentation/assets/image/Demo02.png" height="550" />
+				</section>
+				
+				<section data-background-image="presentation/assets/image/Bubbles.jpg" data-background-opacity="0.4">
+					<h3>What We'll Do</h3>
+
+					<img src="presentation/assets/image/Demo03.png" height="550" />
+				</section>
+				
+				<section data-background-image="presentation/assets/image/Bubbles.jpg" data-background-opacity="0.4">
+					<h3>What We'll Do</h3>
+					
+					<img src="presentation/assets/image/Demo04.png" height="550" />
+				</section>
+				
+				<section data-background-image="presentation/assets/image/Bubbles.jpg" data-background-opacity="0.4">
+					<h3>What We'll Do</h3>
+					
+					<img src="presentation/assets/image/Demo05.png" height="550" />
+				</section>
+
+				<section data-background-image="presentation/assets/image/Bubbles.jpg" data-background-opacity="0.4">
+					<h3>Agenda</h3>
+					
+					<ol>
+						<li class="active">A Brief History of [x]Ops</li>
+						<li>Review a Model</li>
+						<li>The MLOps Maturity Model</li>
+						<li>Connecting GitHub and Azure ML</li>
+						<li>GitHub Actions</li>
+						<li>Performing Model Updates</li>
+					</ol>
+				</section>
+
+				<section data-background-image="presentation/assets/background/muay-thai.jpg" data-background-opacity="0.2">
+					<h3>The Bad Old Days</h3>
+					
+					<table>
+						<thead>
+							<th>Developers</th>
+							<th>Administrators</th>
+						</thead>
+						<tbody>
+							<tr>
+								<td>Get paid to write and push code</td>
+								<td>Get paid to keep servers and systems running</td>
+							</tr>
+							<tr>
+								<td>Tasks given by product managers</td>
+								<td>Tasks given by internal IT management</td>
+							</tr>
+							<tr>
+								<td>Rarely on call</td>
+								<td>Usually on call</td>
+							</tr>
+							<tr>
+								<td>Love to deploy code on a Friday afternoon at 4:30 PM</td>
+								<td>"Love" to get paged at 3 AM and the developer is asleep or too drunk to help</td>
+							</tr>
+						</tbody>
+					</table>
+				</section>
+
+				<section data-background-image="presentation/assets/background/problem.jpg" data-background-opacity="0.2">
+					<h3>The Core Problem</h3>
+					
+					<p>Ultimately, this is an incentive alignment problem, made harder because the two groups' chains of command often meet only at very high levels.</p>
+				</section>
+
+				<section data-background-image="presentation/assets/background/documents.jpg" data-background-opacity="0.2">
+					<h3>DevOps</h3>
+					
+					<p>DevOps is a combination of <strong>people</strong>, <strong>practices</strong>, and <strong>tools</strong>, intended to solve some incentive compatibility problems between development teams and operations teams.</p>
+				</section>
+
+				<section data-background-image="presentation/assets/background/handshake.jpg" data-background-opacity="0.2">
+					<h3>Key DevOps Concepts</h3>
+					
+					<ul>
+						<li>Continuous integration and continuous deployment</li>
+						<li>Developers building tooling for Operations</li>
+						<li>Developers owning and managing their deployments</li>
+						<li>Developers and Operations collaborating closely</li>
+					</ul>
+				</section>
+
+				<section data-background-image="presentation/assets/background/records.jpg" data-background-opacity="0.2">
+					<h3>DevOps to DataOps</h3>
+					
+					<p>DevOps is ultimately about shipping code and related artifacts more effectively.</p>
+
+					<p>The next challenge is data:  databases are <strong>stateful</strong>, making them harder to change.</p>
+				</section>
+
+				<section data-background-image="presentation/assets/background/data.jpg" data-background-opacity="0.2">
+					<h3>Key DataOps Extensions</h3>
+
+					<ul>
+						<li>Database code is code--make it part of source control and CI/CD</li>
+						<li>Manage "static" or "reference" data, ideally in source control</li>
+					</ul>
+				</section>
+
+				<section data-background-image="presentation/assets/background/lab.jpg" data-background-opacity="0.2">
+					<h3>DataOps to MLOps</h3>
+					
+					<p>If DataOps is DevOps plus data management, then MLOps is DataOps plus machine learning models.</p>
+				</section>
+
+				<section data-background-image="presentation/assets/image/Bubbles.jpg" data-background-opacity="0.4">
+					<h3>DataOps to MLOps</h3>
+					
+					<img src="presentation/assets/image/data-science-lifecycle-model-flow.png" />
+					<a href="https://learn.microsoft.com/en-us/azure/architecture/example-scenario/mlops/mlops-technical-paper">Source</a>
+				</section>
+
+				<section data-background-image="presentation/assets/background/robot.jpg" data-background-opacity="0.2">
+					<h3>Key MLOps Extensions</h3>
+
+					<ul>
+						<li>Managing large datasets for training</li>
+						<li>Training, deploying, and <strong>retraining</strong> models in a CI/CD manner</li>
+						<li>Managing trained models over time</li>
+					</ul>
+				</section>
+
+				<section data-background-image="presentation/assets/image/Bubbles.jpg" data-background-opacity="0.4">
+					<h3>Agenda</h3>
+					
+					<ol>
+						<li>A Brief History of [x]Ops</li>
+						<li class="active">Review a Model</li>
+						<li>The MLOps Maturity Model</li>
+						<li>Connecting GitHub and Azure ML</li>
+						<li>GitHub Actions</li>
+						<li>Performing Model Updates</li>
+					</ol>
+				</section>
+
+				<section data-background-image="presentation/assets/background/code.jpg" data-background-opacity="0.2">
+					<h3>Code Notes</h3>
+					
+					<p>We will use code-first Azure ML pipelines that we built in the prior talk, Getting Beyond the Basics with Azure Machine Learning (<a href="https://csmore.info/on/amlindepth">https://csmore.info/on/amlindepth</a>).</p>
+					
+					<p>We will only consider the code at a high level in this talk.</p>
+				</section>
+				
+				<section data-background-image="presentation/assets/background/demo.jpg" data-background-opacity="0.2">
+					<h3>Demo Time</h3>
+				</section>
+
+				<section data-background-image="presentation/assets/image/Bubbles.jpg" data-background-opacity="0.4">
+					<h3>Agenda</h3>
+					
+					<ol>
+						<li>A Brief History of [x]Ops</li>
+						<li>Review a Model</li>
+						<li class="active">The MLOps Maturity Model</li>
+						<li>Connecting GitHub and Azure ML</li>
+						<li>GitHub Actions</li>
+						<li>Performing Model Updates</li>
+					</ol>
+				</section>
+				
+				<section data-background-image="presentation/assets/background/model.jpg" data-background-opacity="0.2">
+					<h3>MLOps Maturity Models</h3>
+					
+					<p>Microsoft and Google each have MLOps maturity level models, with Microsoft's being more fine-grained.  As a result, we will review the Microsoft model--though the Google one is good as well!</p>
+				</section>
+				
+				<section data-background-image="presentation/assets/image/Bubbles.jpg" data-background-opacity="0.4">
+					<img src="presentation/assets/image/MLOpsLevel0.png" />
+				</section>
+				
+				<section data-background-image="presentation/assets/image/Bubbles.jpg" data-background-opacity="0.4">
+					<img src="presentation/assets/image/MLOpsLevel1.png" />
+				</section>
+				
+				<section data-background-image="presentation/assets/image/Bubbles.jpg" data-background-opacity="0.4">
+					<img src="presentation/assets/image/MLOpsLevel2.png" />
+				</section>
+				
+				<section data-background-image="presentation/assets/image/Bubbles.jpg" data-background-opacity="0.4">
+					<img src="presentation/assets/image/MLOpsLevel3.png" />
+				</section>
+				
+				<section data-background-image="presentation/assets/image/Bubbles.jpg" data-background-opacity="0.4">
+					<img src="presentation/assets/image/MLOpsLevel4.png" />
+				</section>
+
+				<section data-background-image="presentation/assets/image/Bubbles.jpg" data-background-opacity="0.4">
+					<h3>Agenda</h3>
+					
+					<ol>
+						<li>A Brief History of [x]Ops</li>
+						<li>Review a Model</li>
+						<li>The MLOps Maturity Model</li>
+						<li class="active">Connecting GitHub and Azure ML</li>
+						<li>GitHub Actions</li>
+						<li>Performing Model Updates</li>
+					</ol>
+				</section>
+
+				<section data-background-image="presentation/assets/image/Bubbles.jpg" data-background-opacity="0.4">
+					<h3>The Security Architecture</h3>
+					
+					<img src="presentation/assets/image/GitHub Actions Overview.png" />
+				</section>
+
+				<section data-background-image="presentation/assets/image/Bubbles.jpg" data-background-opacity="0.4">
+					<h3>The Security Architecture</h3>
+					
+					<img src="presentation/assets/image/FederationSetup01.png" />
+				</section>
+
+				<section data-background-image="presentation/assets/image/Bubbles.jpg" data-background-opacity="0.4">
+					<h3>The Security Architecture</h3>
+					
+					<img src="presentation/assets/image/FederationSetup02.png" />
+				</section>
+
+				<section data-background-image="presentation/assets/image/Bubbles.jpg" data-background-opacity="0.4">
+					<h3>The Security Architecture</h3>
+					
+					<img src="presentation/assets/image/FederationSetup03.png" />
+				</section>
+
+				<section data-background-image="presentation/assets/image/Bubbles.jpg" data-background-opacity="0.4">
+					<h3>The Security Architecture</h3>
+					
+					<img src="presentation/assets/image/FederationSetup04.png" />
+				</section>
+
+				<section data-background-image="presentation/assets/image/Bubbles.jpg" data-background-opacity="0.4">
+					<h3>The Security Architecture</h3>
+					
+					<img src="presentation/assets/image/FederationSetup05.png" />
+				</section>
+
+				<section data-background-image="presentation/assets/image/Bubbles.jpg" data-background-opacity="0.4">
+					<h3>The Security Architecture</h3>
+					
+					<img src="presentation/assets/image/FederationSetup06.png" />
+				</section>
+
+				<section data-background-image="presentation/assets/image/Bubbles.jpg" data-background-opacity="0.4">
+					<h3>The Security Architecture</h3>
+					
+					<img src="presentation/assets/image/FederationSetup07.png" />
+				</section>
+
+				<section data-background-image="presentation/assets/image/Bubbles.jpg" data-background-opacity="0.4">
+					<h3>The Security Architecture</h3>
+					
+					<img src="presentation/assets/image/FederationSetup08.png" />
+				</section>
+
+				<section data-background-image="presentation/assets/image/Bubbles.jpg" data-background-opacity="0.4">
+					<h3>The Security Architecture</h3>
+					
+					<img src="presentation/assets/image/FederationSetup09.png" />
+				</section>
+
+				<section data-background-image="presentation/assets/image/Bubbles.jpg" data-background-opacity="0.4">
+					<h3>The Security Architecture</h3>
+					
+					<img src="presentation/assets/image/FederationSetup10.png" height="550" />
+				</section>
+
+				<section data-background-image="presentation/assets/image/Bubbles.jpg" data-background-opacity="0.4">
+					<h3>Agenda</h3>
+					
+					<ol>
+						<li>A Brief History of [x]Ops</li>
+						<li>Review a Model</li>
+						<li>The MLOps Maturity Model</li>
+						<li>Connecting GitHub and Azure ML</li>
+						<li class="active">GitHub Actions</li>
+						<li>Performing Model Updates</li>
+					</ol>
+				</section>
+
+				<section data-background-image="presentation/assets/image/Bubbles.jpg" data-background-opacity="0.4">
+					<h3>An Overview of GitHub Actions</h3>
+
+					<img src="presentation/assets/image/github-actions-workflow-components.png" />
+				</section>
+
+				<section data-background-image="presentation/assets/background/demo.jpg" data-background-opacity="0.2">
+					<h3>Demo Time</h3>
+				</section>
+
+				<section data-background-image="presentation/assets/image/Bubbles.jpg" data-background-opacity="0.4">
+					<h3>Agenda</h3>
+					
+					<ol>
+						<li>A Brief History of [x]Ops</li>
+						<li>Review a Model</li>
+						<li>The MLOps Maturity Model</li>
+						<li>Connecting GitHub and Azure ML</li>
+						<li>GitHub Actions</li>
+						<li class="active">Performing Model Updates</li>
+					</ol>
+				</section>
+
+				<section data-background-image="presentation/assets/background/tree.jpg" data-background-opacity="0.2">
+					<h3>Branching Strategies</h3>
+
+					<p>Before we get into performing model updates, we should briefly consider popular branching strategies.</p>
+				</section>
+
+				<section data-background-image="presentation/assets/image/Bubbles.jpg" data-background-opacity="0.4">
+					<h3>Single Branch</h3>
+
+					<img src="presentation/assets/image/Single Branch.png" />
+				</section>
+
+				<section data-background-image="presentation/assets/image/Bubbles.jpg" data-background-opacity="0.4">
+					<h3>Feature Branching</h3>
+
+					<img src="presentation/assets/image/Feature Branching.png" />
+				</section>
+
+				<section data-background-image="presentation/assets/image/Bubbles.jpg" data-background-opacity="0.4">
+					<h3>Environmental Branch</h3>
+
+					<img src="presentation/assets/image/Environmental Branching.png" />
+				</section>
+
+				<section data-background-image="presentation/assets/image/Bubbles.jpg" data-background-opacity="0.4">
+					<h3>Release Branching</h3>
+
+					<img src="presentation/assets/image/Release Branching.png" />
+				</section>
+
+				<section data-background-image="presentation/assets/background/skeleton-thinking.jpg" data-background-opacity="0.2">
+					<h3>Choosing a Strategy</h3>
+
+					<p>We will want to use environmental branching for this demo, though all four are useful (and there are other useful strategies as well!).</p>
+
+					<p>Key reasons:</p>
+					<ul>
+						<li>Dev and production releases allow for multiple workspaces</li>
+						<li>Azure ML tracks model history, so we don't need explicit releases in GitHub</li>
+					</ul>
+				</section>
+
+				<section data-background-image="presentation/assets/background/demo.jpg" data-background-opacity="0.2">
+					<h3>Demo Time</h3>
+				</section>
+
+				<section data-background-image="presentation/assets/background/wrappingup.jpg" data-background-opacity="0.2">
+					<h3>Wrapping Up</h3>
+
+					<p>Over the course of this talk, we have gained an understanding of what Machine Learning Operations (MLOps) is, the MLOps maturity model, and how to use GitHub Actions to automate Azure ML pipelines.</p>
+				</section>
+				
+				<section data-background-image="presentation/assets/image/Bubbles.jpg" data-background-opacity="0.4">
+					<h3>Wrapping Up</h3>
+					
+					<p>
+						To learn more, go here:
+						<br />
+						<a href="https://csmore.info/on/mlops">https://csmore.info/on/mlops</a>
+					</p>
+					<p>
+						And for help, contact me:
+						<br />
+						<a href="mailto:feasel@catallaxyservices.com">feasel@catallaxyservices.com</a> | <a href="https://www.twitter.com/feaselkl">@feaselkl</a>
+					</p>
+					<br />
+					<p>
+						Catallaxy Services consulting:
+						<br />
+						<a href="https://csmore.info/contact">https://CSmore.info/on/contact</a>
+					</p>
+				</section>
+			</div>
+		</div>
+
+		<script src="../reveal.js/dist/reveal.js"></script>
+		<script src="../reveal.js/plugin/zoom/zoom.js"></script>
+		<script src="../reveal.js/plugin/notes/notes.js"></script>
+		<script src="../reveal.js/plugin/search/search.js"></script>
+		<script src="../reveal.js/plugin/markdown/markdown.js"></script>
+		<script src="../reveal.js/plugin/math/math.js"></script>
+		<script src="../reveal.js/plugin/menu/menu.js"></script>
+		<script src="../reveal.js/plugin/highlight/highlight.js"></script>
+		<script src="../reveal.js/plugin/chart/Chart.min.js"></script>
+		<script src="../reveal.js/plugin/chart/plugin.js"></script>
+		<script>
+			// More info about initialization & config:
+			// - https://revealjs.com/initialization/
+			// - https://revealjs.com/config/
+			Reveal.initialize({
+				width: '70%',
+				controls: true,
+				progress: true,
+				center: true,
+				hash: true,
+				transition: 'fade',
+				
+
+				// Learn about plugins: https://revealjs.com/plugins/
+				plugins: [ RevealZoom, RevealNotes, RevealSearch, RevealMarkdown, RevealHighlight, RevealMath, RevealMenu, RevealChart ]
+			});
+		</script>
+	</body>
+</html>
